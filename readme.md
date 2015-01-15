@@ -21,4 +21,4 @@ This module is dependent on the PIL(Pillow). First import `histogram`:
 
 ## LICENSE
 These files are released under the MIT License, see
-[LICENSE.txt](docs/LICENSE.txt).
+[LICENSE.txt](LICENSE.txt).
