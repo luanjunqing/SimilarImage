@@ -3,7 +3,7 @@ Similar Image Search using Histogram Intersection. in python3.
 
 ## Description
 This module is for the similar image search using the Histogram Intersection.
-This module is dependent on the PIL(Pillow). Use this:
+This module is dependent on the PIL(Pillow).
 
 ## Requirements
 * Python3.4
