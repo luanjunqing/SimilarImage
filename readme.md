@@ -14,7 +14,15 @@ This module is dependent on the PIL(Pillow).
 >>> import histogram as hi
 >>> from histogram import Histogram
 ```
-Please read [*doctest*](.histogram.md "doctest") if you want to know more.
+Please read *doctests*(.histogram.md "doctest") if you want to know more.
+
+These are *doctests* about...
+* [histogram.py][histogram]
+* [similarsearch.py][similarsearch]
+
+[histogram]: .histogram.md "histogram doc"
+[similarsearch]: .similarsearch.md "similarsearch doc"
+
 
 ## LICENSE
 These files are released under the MIT License, see [LICENSE.txt](LICENSE.txt).
