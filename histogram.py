@@ -9,31 +9,32 @@ from multiprocessing import Pool
 
 
 IMG_PATH = os.path.join(os.environ['HOME'], 'Pictures/dataset')
-EXTITLE = lambda info: '_division%d_slice%d_palette%d' % info
+EXTITLE = lambda info: '_crop%d_scheibe%d_palette%d' % info
 HISTOGRAM_PATH = lambda d, info: os.path.join(d, '.histogram'+EXTITLE(info))
 
 
 class Histogram(object):
-    def __init__(self, crop=1, slice=1, palette=1, precision=0.8):
-        self.CROP = crop
-        self.SLICE = slice
-        self.PALETTE = palette
-        self.PRECISION = precision
+    def __init__(self, crop, scheibe, palette):
+        self.setinfo(crop, scheibe, palette)
+
+    def open(self, fp):
+        self.ImgObj = Image.open(fp)
+        return self
 
     def getinfo(self):
-        return self.CROP, self.SLICE, self.PALETTE, self.PRECISION
+        return self.CROP, self.SLICE, self.PALETTE
 
-    def setinfo(self, crp, slc, plt, prc):
-        self.CROP = crp
-        self.SLICE = slc
-        self.PALETTE = plt
-        self.PRECISION = prc
+    def setinfo(self, crop=None, scheibe=None, palette=None):
+        self.CROP = crop if crop else self.CROP
+        self.SLICE = scheibe if scheibe else self.SLICE
+        self.PALETTE = palette if palette else self.PALETTE
 
-    def getrgb(self, ImgObj):
-        rgb = ImgObj.convert("RGB")
+    def getrgb(self):
+        rgb = self.ImgObj.convert("RGB")
         return list(rgb.getdata())
 
-    def generate(self, rgb):
+    def generate(self):
+        rgb = self.getrgb()
         PALETTE = self.PALETTE
         histogram = [0 for _ in range(1 << (PALETTE*3))]
         for dot in rgb:
@@ -41,82 +42,106 @@ class Histogram(object):
             histogram[(r << (PALETTE*2))+(g << PALETTE)+b] += 1
         return histogram
 
-    def crop(self, ImgObj):
-        CROP = self.CROP
+    def crop(self):
         cropped = []
-        width, height = map(lambda n: n // CROP, ImgObj.size)
+        CROP = self.CROP
+        width, height = map(lambda n: n // CROP, self.ImgObj.size)
         for w in range(CROP):
             for h in range(CROP):
                 box = (w*width, h*height, (w+1)*width, (h+1)*height)
-                cropped.append(ImgObj.crop(box))
+                cropped.append(self.ImgObj.crop(box))
         return cropped
 
-    def form(self, ImgObj):
+    def form(self):
+        ImgObj = self.ImgObj
         histograms = []
-        for piece in crop(ImgObj):
-            rgb = getrgb(piece)
-            histogram = makehistogram(rgb)
-            sliced = slicehistogram(histogram)
+        for piece in self.crop():
+            self.ImgObj = piece
+            rgb = self.getrgb()
+            histogram = self.generate()
+            sliced = slice(histogram, self.SLICE)
             histograms.append(sliced)
+        self.ImgObj = ImgObj
         return histograms
 
 
 def intersection(histogram, comparison):
-    intersect = lambda h, c: sum(map(min, h, c)) / sum(h)
-    return intersect(histogram, comparison)
+    return sum(map(min, histogram, comparison)) / sum(histogram)
 
 
 def compare(base, comparison):
     avg = lambda l: sum(l) / len(l)
-    intersect = lambda b, h: map(intersection, b, h)
+    intersect = lambda b, h: list(map(intersection, b, h))
     cropped = map(intersect, base, comparison)
-    return min(avg(cropped)) # min or avg
+    return min(map(avg, list(cropped))) # min or avg
 
 
-def slice(histogram):
-    SLICE = self.SLICE
-    return [histogram[i::SLICE] for i in range(SLICE)]
+def slice(histogram, scheibe):
+    return [histogram[i::scheibe] for i in range(scheibe)]
 
 
-def StackHistogram(directory, ignore=[]):
+def StackHistogram(directory, crop, scheibe, palette, ignore=[]):
+    global stack
+    precisions = (crop, scheibe, palette)
+    histodir = HISTOGRAM_PATH(directory, precisions)
+
     if not os.path.isdir(directory):
-        raise
-    
-    histodir = HISTOGRAM_PATH(directory)
-    proc = 8
-        
+        raise OSError
     if not os.path.isdir(histodir):
         os.mkdir(histodir)
 
+    def stack(filename):
+        name, ex = filename.split('.')
+        histofile = os.path.join(histodir, name)
+        if ex != 'jpg':
+            print('empty: is not jpg')
+            return
+        if os.path.isfile(histofile):
+            print('empty: already exist')
+            return
+        hst = Histogram(*precisions)
+        try:
+            hst.open(os.path.join(directory, filename))
+        except FileNotFoundError:
+            print('error: file not found')
+            return
+        except OSError:
+            print('error: is not image')
+            return
+        except:
+            raise
+        histograms = hst.form()
+        f = open(histofile, 'w')
+        f.write(json.dumps(histograms))
+        f.close()
+        print('generated: %s' % name)
+
+    proc = 8
     p = Pool(proc)
     through = lambda elm: elm not in ignore
     ignored = filter(through, os.listdir(directory))
-    p.map(exStackHistogram, ignored, directory, histodir)
+    p.map(stack, ignored)
     print('Completed.')
 
 
-def unko(self, filename, directory, histodir):
-    name, ex = filename.split('.')
-    histofile = os.path.join(histodir, name)
 
-    if ex!= 'jpg':
-        print('empty: is not jpg')
+def Search(fp, directory, crop, scheibe, palette, tolerance):
+    precisions = (crop, scheibe, palette)
+    hst = Histogram(*precisions)
+    try:
+        hst.open(fp)
+    except FileNotFoundError:
+        print('error: file not found')
         return
-    if os.path.isfile(histofile):
-        print('empty: already exist')
+    except OSError:
+        print('error: is not image')
         return
-
-    obj = Image.open(os.path.join(directory, filename))
-    histograms = histogen(obj)
-    f = open(histofile, 'w')
-    f.write(json.dumps(histograms))
-    f.close()
-    print('generated: %s' % name)
-
-
-def Search(ImgObj, directory):
-    base = histogen(ImgObj)
-    histodir = HISTOGRAM_PATH(directory)
+    except:
+        raise
+    base = hst.form()
+    histodir = HISTOGRAM_PATH(directory, precisions)
+    if not os.path.isdir(histodir):
+        raise OSError
 
     similar = 0
     for histoname in os.listdir(histodir):
@@ -127,7 +152,7 @@ def Search(ImgObj, directory):
             print('error: %s' % histoname)
             continue
         rate = compare(base, histogram)
-        if rate > PRECISION:
+        if rate >= tolerance:
             similar += 1
 
     return similar
