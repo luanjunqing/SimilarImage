@@ -4,4 +4,4 @@
 import doctest
 
 
-doctest.testfile('histogram.md')
+doctest.testfile('.histogram.md')
