@@ -14,7 +14,7 @@ This module is dependent on the PIL(Pillow).
 >>> import histogram as hi
 >>> from histogram import Histogram
 ```
-Please read *doctests*(.histogram.md "doctest") if you want to know more.
+Please read *doctests* if you want to know more.
 
 These are *doctests* about...
 * [histogram.py][histogram]
