@@ -13,6 +13,7 @@ This module is dependent on the PIL(Pillow).
 ```python
 >>> import histogram as hi
 >>> from histogram import Histogram
+>>> 
 >>> import similarsearch as search
 ```
 Please read *doctests* if you want to know more.
