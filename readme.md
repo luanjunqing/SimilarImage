@@ -1,8 +1,6 @@
 # histogram
 Similar Image Search using Histogram Intersection. in python3.
 
-<<<<<<< HEAD
-=======
 ## Description
 This module is for the similar image search using the Histogram Intersection.
 This module is dependent on the PIL(Pillow).
@@ -10,7 +8,6 @@ This module is dependent on the PIL(Pillow).
 ## Requirements
 * Python3.4
 * [Pillow](http://pillow.readthedocs.org/ "Pillow Documents")
->>>>>>> develop
 
 ## Usage
 ```python
@@ -21,7 +18,6 @@ This module is dependent on the PIL(Pillow).
 ```
 Please read *doctests* if you want to know more.
 
-<<<<<<< HEAD
 ## Requirements
 * Python3.4
 * [Pillow](http://pillow.readthedocs.org/ "Pillow Documents")
@@ -39,7 +35,6 @@ These are *doctests* about...
 
 [histogram]: .histogram.md "histogram doc"
 [similarsearch]: .similarsearch.md "similarsearch doc"
->>>>>>> develop
 
 
 ## LICENSE
