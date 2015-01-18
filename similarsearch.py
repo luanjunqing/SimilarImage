@@ -4,11 +4,12 @@
 import os
 import sys
 import json
-from PIL import Image
 from multiprocessing import Pool
+import histogram as hi
+from histogram import Histogram
 
 
-IMG_PATH = os.path.join(os.environ['HOME'], 'Pictures/dataset')
+# IMG_PATH = os.path.join(os.environ['HOME'], 'Pictures/dataset')
 EXTITLE = lambda info: '_crop%d_scheibe%d_palette%d' % info
 HISTOGRAM_PATH = lambda d, info: os.path.join(d, '.histogram'+EXTITLE(info))
 
@@ -84,7 +85,7 @@ def Search(fp, directory, crop, scheibe, palette, tolerance):
         except:
             print('error: %s' % histoname)
             continue
-        rate = compare(base, histogram)
+        rate = hi.compare(base, histogram)
         if rate >= tolerance:
             similar += 1
 
