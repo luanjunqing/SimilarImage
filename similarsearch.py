@@ -58,7 +58,6 @@ def StackHistogram(directory, crop, scheibe, palette, ignore=[]):
     print('Completed.')
 
 
-
 def Search(fp, directory, crop, scheibe, palette, tolerance):
     precisions = (crop, scheibe, palette)
     hst = Histogram(*precisions)

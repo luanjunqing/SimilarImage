@@ -68,4 +68,4 @@ def compare(base, comparison):
     avg = lambda l: sum(l) / len(l)
     intersect = lambda b, h: list(map(intersection, b, h))
     cropped = map(intersect, base, comparison)
-    return min(map(avg, list(cropped))) # min or avg
+    return min(map(avg, list(cropped)))
