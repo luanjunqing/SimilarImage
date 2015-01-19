@@ -27,6 +27,5 @@ These are *doctests* about...
 
 
 ## LICENSE
-These files are released under the [MIT-like PIL Software License][License]
+These files are released under the [MIT-like PIL Software License][License], see [LICENSE.txt](LICENSE.txt).
 [License]: http://www.pythonware.com/products/pil/license.htm "PIL License"
-the MIT License, see [LICENSE.txt](LICENSE.txt).
