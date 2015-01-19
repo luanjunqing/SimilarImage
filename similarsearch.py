@@ -9,7 +9,7 @@ import histogram as hi
 from histogram import Histogram
 
 
-# IMG_PATH = os.path.join(os.environ['HOME'], 'Pictures/dataset')
+proc = 8
 EXTITLE = lambda info: '_crop%d_scheibe%d_palette%d' % info
 HISTOGRAM_PATH = lambda d, info: os.path.join(d, '.histogram'+EXTITLE(info))
 
@@ -50,7 +50,6 @@ def StackHistogram(directory, crop, scheibe, palette, ignore=[]):
         f.close()
         print('generated: %s' % name)
 
-    proc = 8
     p = Pool(proc)
     through = lambda elm: elm not in ignore
     ignored = filter(through, os.listdir(directory))
@@ -77,7 +76,7 @@ def Search(fp, directory, crop, scheibe, palette, tolerance):
     if not os.path.isdir(histodir):
         raise OSError
 
-    similar = 0
+    similar = []
     for histoname in os.listdir(histodir):
         try:
             jsoned = open(os.path.join(histodir, histoname)).read()
@@ -87,6 +86,6 @@ def Search(fp, directory, crop, scheibe, palette, tolerance):
             continue
         rate = hi.compare(base, histogram)
         if rate >= tolerance:
-            similar += 1
+            similar.append(histoname)
 
     return similar
