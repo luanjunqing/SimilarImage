@@ -38,16 +38,20 @@ def StackHistogram(directory, crop, scheibe, palette, ignore=[]):
             hst.open(os.path.join(directory, filename))
         except FileNotFoundError:
             print('error: file not found')
+            hst.close()
             return
         except OSError:
             print('error: is not image')
+            hst.close()
             return
         except:
+            hst.close()
             raise
         histograms = hst.form()
         f = open(histofile, 'w')
         f.write(json.dumps(histograms))
         f.close()
+        hst.close()
         print('generated: %s' % name)
 
     p = Pool(proc)
@@ -65,9 +69,11 @@ def Search(fp, directory, crop, scheibe, palette, tolerance):
         hst.open(fp)
     except FileNotFoundError:
         print('error: file not found')
+        hst.close()
         return
     except OSError:
         print('error: is not image')
+        hst.close()
         return
     except:
         raise

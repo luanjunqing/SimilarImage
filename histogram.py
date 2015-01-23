@@ -12,6 +12,9 @@ class Histogram(object):
         self.ImgObj = Image.open(fp)
         return self
 
+    def close(self):
+        self.ImgObj.close()
+
     def getinfo(self):
         return self.CROP, self.SLICE, self.PALETTE
 
@@ -57,7 +60,7 @@ class Histogram(object):
 
 
 def intersection(histogram, comparison):
-    return sum(map(min, histogram, comparison)) / sum(histogram)
+    return sum(map(min, histogram, comparison)) / (sum(histogram)+1)
 
 
 def slice(histogram, scheibe):
