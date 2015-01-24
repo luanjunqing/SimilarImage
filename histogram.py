@@ -1,62 +1,20 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-from PIL import Image
+PALETTE = 2
 
 
-class Histogram(object):
-    def __init__(self, crop, scheibe, palette):
-        self.setinfo(crop, scheibe, palette)
-
-    def open(self, fp):
-        self.ImgObj = Image.open(fp)
-        return self
-
-    def getinfo(self):
-        return self.CROP, self.SLICE, self.PALETTE
-
-    def setinfo(self, crop=None, scheibe=None, palette=None):
-        self.CROP = crop if crop else self.CROP
-        self.SLICE = scheibe if scheibe else self.SLICE
-        self.PALETTE = palette if palette else self.PALETTE
-
-    def getrgb(self):
-        rgb = self.ImgObj.convert("RGB")
-        return list(rgb.getdata())
-
-    def generate(self):
-        rgb = self.getrgb()
-        PALETTE = self.PALETTE
-        histogram = [0 for _ in range(1 << (PALETTE*3))]
-        for dot in rgb:
-            r, g, b = map(lambda emit: emit >> (8-PALETTE), dot)
-            histogram[(r << (PALETTE*2))+(g << PALETTE)+b] += 1
-        return histogram
-
-    def crop(self):
-        cropped = []
-        CROP = self.CROP
-        width, height = map(lambda n: n // CROP, self.ImgObj.size)
-        for w in range(CROP):
-            for h in range(CROP):
-                box = (w*width, h*height, (w+1)*width, (h+1)*height)
-                cropped.append(self.ImgObj.crop(box))
-        return cropped
-
-    def form(self):
-        ImgObj = self.ImgObj
-        histograms = []
-        for piece in self.crop():
-            self.ImgObj = piece
-            rgb = self.getrgb()
-            histogram = self.generate()
-            sliced = slice(histogram, self.SLICE)
-            histograms.append(sliced)
-        self.ImgObj = ImgObj
-        return histograms
+def generate(ImgObj):
+    rgb = ImgObj.convert("RGB")
+    histogram = [0 for _ in range(1 << (PALETTE*3))]
+    for dot in rgb.getdata():
+        r, g, b = map(lambda emit: emit >> (8-PALETTE), dot)
+        histogram[(r << (PALETTE*2))+(g << PALETTE)+b] += 1
+    return histogram
 
 
 def intersection(histogram, comparison):
+<<<<<<< HEAD
     return sum(map(min, histogram, comparison)) / sum(histogram)
 
 
@@ -68,4 +26,11 @@ def compare(base, comparison):
     avg = lambda l: sum(l) / len(l)
     intersect = lambda b, h: list(map(intersection, b, h))
     cropped = map(intersect, base, comparison)
-    return min(map(avg, list(cropped))) # min or avg
+    return min(map(avg, list(cropped)))
+=======
+    denominator = sum(map(min, histogram, comparison))
+    molecule = sum(histogram)
+    if molecule == 0:
+        return 1.0 if denominator == 0 else 0  # ZeroDivision
+    return denominator / molecule
+>>>>>>> feature/experiment
