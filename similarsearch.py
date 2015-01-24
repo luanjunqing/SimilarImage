@@ -5,18 +5,17 @@ import os
 import sys
 import json
 from multiprocessing import Pool
+from PIL import Image
 import histogram as hi
-from histogram import Histogram
 
 
 proc = 8
 HISTOGRAM_PATH = lambda d: os.path.join(d, '.histogram')
 
 
-def StackHistogram(directory, crop, ignore=[]):
+def StackHistogram(directory, ignore=[]):
     global stack
-    precisions = (crop, scheibe, palette)
-    histodir = HISTOGRAM_PATH(directory, precisions)
+    histodir = HISTOGRAM_PATH(directory)
 
     if not os.path.isdir(directory):
         raise OSError
@@ -27,57 +26,41 @@ def StackHistogram(directory, crop, ignore=[]):
         name, ex = filename.split('.')
         histofile = os.path.join(histodir, name)
         if ex != 'jpg':
-            print('empty: is not jpg')
+            print('empty: is not jpg') # logging
             return
         if os.path.isfile(histofile):
-            print('empty: already exist')
+            print('empty: already exist') # logging
             return
-        hst = Histogram(*precisions)
         try:
-            hst.open(os.path.join(directory, filename))
+            img = Image.open(os.path.join(directory, filename))
         except FileNotFoundError:
-            print('error: file not found')
+            print('error: file not found') # logging
             hst.close()
             return
         except OSError:
-            print('error: is not image')
+            print('error: is not image') # logging
             hst.close()
             return
         except:
             hst.close()
             raise
-        histograms = hst.form()
+        histogram = hi.generate(img)
         f = open(histofile, 'w')
-        f.write(json.dumps(histograms))
+        f.write(json.dumps(histogram))
         f.close()
-        hst.close()
-        print('generated: %s' % name)
+        print('generated: %s' % name) # logging
 
     p = Pool(proc)
     through = lambda elm: elm not in ignore
     ignored = filter(through, os.listdir(directory))
     p.map(stack, ignored)
-    print('Completed.')
+    print('Completed.') # logging
 
 
 
-def Search(fp, directory, crop, scheibe, palette, tolerance):
-    precisions = (crop, scheibe, palette)
-    hst = Histogram(*precisions)
-    try:
-        hst.open(fp)
-    except FileNotFoundError:
-        print('error: file not found')
-        hst.close()
-        return
-    except OSError:
-        print('error: is not image')
-        hst.close()
-        return
-    except:
-        raise
-    base = hst.form()
-    histodir = HISTOGRAM_PATH(directory, precisions)
+def Search(ImgObj, directory, tolerance):
+    base = hi.generate(ImgObj)
+    histodir = HISTOGRAM_PATH(directory)
     if not os.path.isdir(histodir):
         raise OSError
 
@@ -87,27 +70,10 @@ def Search(fp, directory, crop, scheibe, palette, tolerance):
             jsoned = open(os.path.join(histodir, histoname)).read()
             histogram = json.loads(jsoned)
         except:
-            print('error: %s' % histoname)
+            print('error: %s' % histoname) # logging
             continue
-        rate = hi.compare(base, histogram)
+        rate = hi.intersection(base, histogram)
         if rate >= tolerance:
             similar.append(histoname)
 
     return similar
-
-#!/usr/bin/env python3
-# coding: utf-8
-
-
-def histogram(ImgObj):
-    rgb = ImgObj.convert("RGB")
-    PALETTE = 2
-    histogram = [0 for _ in range(1 << (PALETTE*3))]
-    for dot in rgb.getdata():
-        r, g, b = map(lambda emit: emit >> (8-PALETTE), dot)
-        histogram[(r << (PALETTE*2))+(g << PALETTE)+b] += 1
-    return histogram
-
-
-def intersection(histogram, comparison):
-    return sum(map(min, histogram, comparison)) / (sum(histogram)+1)
