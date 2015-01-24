@@ -1,4 +1,4 @@
-# histogram
+# SimilarImage
 Similar Image Search using Histogram Intersection. in python3.
 
 ## Description
@@ -12,8 +12,6 @@ This module is dependent on the PIL(Pillow).
 ## Usage
 ```python
 >>> import histogram as hi
->>> from histogram import Histogram
->>> 
 >>> import similarsearch as search
 ```
 Please read *doctests* if you want to know more.
@@ -27,4 +25,6 @@ These are *doctests* about...
 
 
 ## LICENSE
-These files are released under the MIT License, see [LICENSE.txt](LICENSE.txt).
+These files are released under the [MIT-like PIL Software License][License].
+
+[License]: http://www.pythonware.com/products/pil/license.htm "PIL License"
