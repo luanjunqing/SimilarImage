@@ -17,5 +17,5 @@ def intersection(histogram, comparison):
     denominator = sum(map(min, histogram, comparison))
     molecule = sum(histogram)
     if molecule == 0:
-        return 1.0 if denominator==0 else 0 # ZeroDivision
-    return  denominator / molecule
+        return 1.0 if denominator == 0 else 0  # ZeroDivision
+    return denominator / molecule

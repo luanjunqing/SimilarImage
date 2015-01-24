@@ -26,19 +26,19 @@ def StackHistogram(directory, ignore=[]):
         name, ex = filename.split('.')
         histofile = os.path.join(histodir, name)
         if ex != 'jpg':
-            print('empty: is not jpg') # logging
+            print('empty: is not jpg')  # logging
             return
         if os.path.isfile(histofile):
-            print('empty: already exist') # logging
+            print('empty: already exist')  # logging
             return
         try:
             img = Image.open(os.path.join(directory, filename))
         except FileNotFoundError:
-            print('error: file not found') # logging
+            print('error: file not found')  # logging
             hst.close()
             return
         except OSError:
-            print('error: is not image') # logging
+            print('error: is not image')  # logging
             hst.close()
             return
         except:
@@ -48,14 +48,13 @@ def StackHistogram(directory, ignore=[]):
         f = open(histofile, 'w')
         f.write(json.dumps(histogram))
         f.close()
-        print('generated: %s' % name) # logging
+        print('generated: %s' % name)  # logging
 
     p = Pool(proc)
     through = lambda elm: elm not in ignore
     ignored = filter(through, os.listdir(directory))
     p.map(stack, ignored)
-    print('Completed.') # logging
-
+    print('Completed.')  # logging
 
 
 def Search(ImgObj, directory, tolerance):
@@ -70,7 +69,7 @@ def Search(ImgObj, directory, tolerance):
             jsoned = open(os.path.join(histodir, histoname)).read()
             histogram = json.loads(jsoned)
         except:
-            print('error: %s' % histoname) # logging
+            print('error: %s' % histoname)  # logging
             continue
         rate = hi.intersection(base, histogram)
         if rate >= tolerance:
