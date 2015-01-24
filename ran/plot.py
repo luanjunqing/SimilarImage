@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-fps = ['crop', 'scheibe', 'precision']
+fps = ['crop', 'scheibe', 'palette', 'precision']
 
 def parse(fp, t):
     f = open(fp).read().split()
@@ -15,7 +15,7 @@ def plot(fp):
     ax2.plot(parse(fp, 0), color='r', label='time')
     ax2.set_ylabel('time')
     ax1.set_ylim(0, 1000)
-    ax2.set_ylim(0, 2)
+    ax2.set_ylim(bottom=0)
     # ax1.legend(loc=0)
     # ax2.legend(loc=0)
     fig.savefig(fp+'.png')

@@ -10,11 +10,10 @@ from histogram import Histogram
 
 
 proc = 8
-EXTITLE = lambda info: '_crop%d_scheibe%d_palette%d' % info
-HISTOGRAM_PATH = lambda d, info: os.path.join(d, '.histogram'+EXTITLE(info))
+HISTOGRAM_PATH = lambda d: os.path.join(d, '.histogram')
 
 
-def StackHistogram(directory, crop, scheibe, palette, ignore=[]):
+def StackHistogram(directory, crop, ignore=[]):
     global stack
     precisions = (crop, scheibe, palette)
     histodir = HISTOGRAM_PATH(directory, precisions)
@@ -95,3 +94,20 @@ def Search(fp, directory, crop, scheibe, palette, tolerance):
             similar.append(histoname)
 
     return similar
+
+#!/usr/bin/env python3
+# coding: utf-8
+
+
+def histogram(ImgObj):
+    rgb = ImgObj.convert("RGB")
+    PALETTE = 2
+    histogram = [0 for _ in range(1 << (PALETTE*3))]
+    for dot in rgb.getdata():
+        r, g, b = map(lambda emit: emit >> (8-PALETTE), dot)
+        histogram[(r << (PALETTE*2))+(g << PALETTE)+b] += 1
+    return histogram
+
+
+def intersection(histogram, comparison):
+    return sum(map(min, histogram, comparison)) / (sum(histogram)+1)
