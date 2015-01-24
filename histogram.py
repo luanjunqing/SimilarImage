@@ -14,4 +14,8 @@ def generate(ImgObj):
 
 
 def intersection(histogram, comparison):
-    return sum(map(min, histogram, comparison)) / (sum(histogram)+1)
+    denominator = sum(map(min, histogram, comparison))
+    molecule = sum(histogram)
+    if molecule == 0:
+        return 1.0 if denominator==0 else 0 # ZeroDivision
+    return  denominator / molecule
